@@ -1,4 +1,5 @@
 #include "MainGame.h"
+#include<iostream>
 
 MainGame::MainGame()
 {
@@ -36,20 +37,23 @@ int MainGame::run()
 	sf::Clock clock;
 	float deltatime = 0.0f;
 	bool serverReady = false;
-	if (this->client.connect("192.168.1.67"))
-	{
-		serverReady = true;
 
-		std::thread([&]() {
-			while (true)
-			{
-				if (this->client.listen(&this->second_player))
+	std::thread([&]() {
+		if (this->client.connect("192.168.1.67"))
+		{
+			serverReady = true;
+
+			std::thread([&]() {
+				while (true)
 				{
-					this->render_update = true;
+					if (this->client.listen(&this->second_player))
+					{
+						this->render_update = true;
+					}
 				}
-			}
-		}).detach();
-	}
+			}).detach();
+		}
+	}).detach();
 
 	while (window.isOpen())
 	{

@@ -19,7 +19,7 @@ bool GameClient::connect(const char* local)
 void GameClient::send(Player& player)
 {
 	GamePlayerData data = { player.state,player.position,player.life,player.direction };
-	this->listenner.send("player:update",(void*)&data);
+	this->listenner.send("player:update",&data);
 }
 
 void GameClient::ping()
@@ -36,7 +36,7 @@ void GameClient::ping()
 bool GameClient::listen(Player* player)
 {
 	GamePlayerData data;
-	if (this->listenner.listen("player:update", (void*)&data))
+	if (this->listenner.listen("player:update", &data))
 	{
 		player->direction = (PlayerDirection)data.direction;
 		player->life = data.life;
