@@ -2,6 +2,6 @@
 
 int main(int argc, const char* argv[])
 {
-	MainGame game = MainGame();
-	return game.run();
+	MainGame* game = new MainGame();
+	return game->run();
 }

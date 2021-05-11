@@ -142,6 +142,7 @@
     <ClCompile Include="GameAssets.cpp" />
     <ClCompile Include="GameClient.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="Listenner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="GameAssets.h" />
     <ClInclude Include="GameClient.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="Listenner.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>

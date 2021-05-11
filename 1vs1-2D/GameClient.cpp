@@ -1,28 +1,49 @@
 #include "GameClient.h"
-
+#include<iostream>
 
 GameClient::GameClient()
 {
-	const char* local = "192.168.112.1";
+}
+
+bool GameClient::connect(const char* local)
+{
 	sf::Socket::Status status = socket.connect(local, 53000);
 	if (status != sf::Socket::Done)
 	{
-		exit(1);
+		return false;
+	}
+	this->listenner.set_client(socket);
+	return true;
+}
+
+void GameClient::send(Player& player)
+{
+	GamePlayerData data = { player.state,player.position,player.life,player.direction };
+	this->listenner.send("player:update",(void*)&data);
+}
+
+void GameClient::ping()
+{
+	time_t t = time(0);
+	if (this->listenner.listen("ping", (void*)t))
+	{
+		time_t ti = time(0);
+		std::cout << ti - t << "ms" << std::endl;
+		this->listenner.send("ping", (void*)ti);
 	}
 }
 
-void GameClient::send_update(Player& main_player)
+bool GameClient::listen(Player* player)
 {
-	sf::Packet packet;
-	packet.append(&(Player)main_player,sizeof(Player));
-	this->socket.send(packet);
-}
-
-bool GameClient::listen_update(Player* second_player)
-{
-	sf::Packet packet;
-	this->socket.receive(packet);
-	second_player = (Player*)packet.getData();
+	GamePlayerData data;
+	if (this->listenner.listen("player:update", (void*)&data))
+	{
+		player->direction = (PlayerDirection)data.direction;
+		player->life = data.life;
+		player->position = data.coord;
+		player->state = (PlayerStates)data.state;
+		return true;
+	}
 	return false;
 }
 

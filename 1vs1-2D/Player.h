@@ -2,7 +2,7 @@
 #include<SFML/Graphics.hpp>
 #include "GameAssets.h"
 
-enum PlayerSates
+enum PlayerStates
 {
 	ATTACK,
 	STATIC,
@@ -24,7 +24,7 @@ public:
 	~Player();
 
 	sf::Vector2f position;
-	PlayerSates state = STATIC;
+	PlayerStates state = STATIC;
 	PlayerDirection direction = RIGHT;
 	float life = 100.0f;
 

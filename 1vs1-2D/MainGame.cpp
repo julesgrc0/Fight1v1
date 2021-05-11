@@ -2,7 +2,6 @@
 
 MainGame::MainGame()
 {
-	this->render_update = true;
 }
 
 void render(sf::RenderWindow* window, MainGame* game)
@@ -36,6 +35,21 @@ int MainGame::run()
 	sf::Event event;
 	sf::Clock clock;
 	float deltatime = 0.0f;
+	bool serverReady = false;
+	if (this->client.connect("192.168.1.67"))
+	{
+		serverReady = true;
+
+		std::thread([&]() {
+			while (true)
+			{
+				if (this->client.listen(&this->second_player))
+				{
+					this->render_update = true;
+				}
+			}
+		}).detach();
+	}
 
 	while (window.isOpen())
 	{
@@ -47,15 +61,13 @@ int MainGame::run()
 				window.close();
 			}
 		}
-		
+
 		if (this->main_player.update(deltatime))
 		{
-			this->client.send_update(this->main_player);
-			this->render_update = true;
-		}
-
-		if (this->client.listen_update(&this->second_player))
-		{
+			if (serverReady)
+			{
+				this->client.send(this->main_player);
+			}
 			this->render_update = true;
 		}
 	}

@@ -14,7 +14,7 @@ public:
 	~MainGame();
 	int run();
 
-	bool render_update = false;
+	bool render_update = true;
 	Player main_player;
 	Player second_player;
 	HUD main_hud;
