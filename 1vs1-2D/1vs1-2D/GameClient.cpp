@@ -18,7 +18,12 @@ bool GameClient::connect(const char* local)
 
 void GameClient::send(Player& player)
 {
-	GamePlayerData data = { player.state,player.position,player.life,player.direction };
+	GamePlayerData data = { 
+		player.state,
+		player.position,
+		player.life,
+		player.direction
+	};
 	this->listenner.send("player:update",&data);
 }
 
@@ -28,7 +33,6 @@ void GameClient::ping()
 	if (this->listenner.listen("ping", (void*)t))
 	{
 		time_t ti = time(0);
-		std::cout << ti - t << "ms" << std::endl;
 		this->listenner.send("ping", (void*)ti);
 	}
 }
