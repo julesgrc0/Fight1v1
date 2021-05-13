@@ -3,15 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <chrono>
-#include "Listenner.h"
-
-struct GamePlayerData
-{
-	int state = 0;
-	sf::Vector2f coord = sf::Vector2f(0,0);
-	int life = 100;
-	int direction = 0;
-};
 
 void print_player(const char* msg, sf::TcpSocket* player)
 {
@@ -33,21 +24,17 @@ void remove_from_players(sf::TcpSocket* player, std::vector<sf::TcpSocket*>* pla
 void player_thread(sf::TcpSocket* player, std::vector<sf::TcpSocket*>* players)
 {
 	print_player("[new player] ", player);
-	Listenner player_listenner = Listenner(player);
 	
 	while (true)
 	{
-		GamePlayerData player_data;
-		if (player_listenner.listen("player:update", &player_data))
+		sf::Packet packet;
+		if (player->receive(packet) == sf::Socket::Done)
 		{
-			
 			for (size_t i = 0; i < players->size(); i++)
 			{
 				if (!((*player).getRemoteAddress() == (*(*players)[i]).getRemoteAddress() && (*player).getRemotePort() == (*(*players)[i]).getRemotePort()))
 				{
-					Listenner temp_listenner = Listenner((*players)[i]);
-					player_data.coord = sf::Vector2f(10, 10);
-					if (!temp_listenner.send("player:update", &player_data))
+					if ((*players)[i]->send(packet) != sf::Socket::Done)
 					{
 						remove_from_players((*players)[i], players);
 						i--;

@@ -12,40 +12,36 @@ bool GameClient::connect(const char* local)
 	{
 		return false;
 	}
-	this->listenner.set_client(socket);
 	return true;
 }
 
 void GameClient::send(Player& player)
 {
-	GamePlayerData data = { 
-		player.state,
-		player.position,
-		player.life,
-		player.direction
-	};
-	this->listenner.send("player:update",&data);
+	sf::Packet packet;
+	packet << (int)player.state << (float)player.position.x << (float)player.position.y << (int)player.life << (int)player.direction;
+	this->socket.send(packet);
 }
 
-void GameClient::ping()
-{
-	time_t t = time(0);
-	if (this->listenner.listen("ping", (void*)t))
-	{
-		time_t ti = time(0);
-		this->listenner.send("ping", (void*)ti);
-	}
-}
 
 bool GameClient::listen(Player* player)
 {
-	GamePlayerData data;
-	if (this->listenner.listen("player:update", &data))
+	sf::Packet packet;
+	if (this->socket.receive(packet) == sf::Socket::Done)
 	{
-		player->direction = (PlayerDirection)data.direction;
-		player->life = data.life;
-		player->position = data.coord;
-		player->state = (PlayerStates)data.state;
+		int state;
+		float x;
+		float y;
+		int life;
+		int direction;
+
+		packet >> state >> x >> y >> life >> direction;
+
+		player->life = life;
+		player->position.x = x;
+		player->position.y = y;
+		player->direction = (PlayerDirection)direction;
+		player->state = (PlayerStates)state;
+
 		return true;
 	}
 	return false;

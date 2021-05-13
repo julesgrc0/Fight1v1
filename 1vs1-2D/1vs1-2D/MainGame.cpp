@@ -37,6 +37,7 @@ int MainGame::run()
 	sf::Clock clock;
 	float deltatime = 0.0f;
 	bool serverReady = false;
+	bool windowFocus = true;
 
 	std::thread([&]() {
 		if (this->client.connect("192.168.1.67"))
@@ -64,9 +65,19 @@ int MainGame::run()
 			{
 				window.close();
 			}
+			
+			if (event.type == sf::Event::GainedFocus)
+			{
+				windowFocus = true;
+			}
+			
+			if (event.type == sf::Event::LostFocus)
+			{
+				windowFocus = false;
+			}
 		}
 
-		if (this->main_player.update(deltatime))
+		if (windowFocus && this->main_player.update(deltatime))
 		{
 			if (serverReady)
 			{
