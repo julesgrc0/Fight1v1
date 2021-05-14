@@ -1,5 +1,4 @@
 #include "Player.h"
-#include<iostream>
 
 Player::Player()
 {
@@ -7,7 +6,7 @@ Player::Player()
 	this->player_r.loadFromFile("C:/Users/jules/source/repos/1vs1-2D/1vs1-2D/x64/Debug/attack_r.png", sf::IntRect(0, 0, 100, 100));
 }
 
-void Player::draw(sf::RenderWindow& window, GameAssets& assets)
+void Player::draw(sf::RenderWindow& window)
 {
 	sf::Sprite sprite;
 	sprite.setPosition(this->position);
@@ -40,9 +39,17 @@ void Player::draw(sf::RenderWindow& window, GameAssets& assets)
 	lifeFill.setFillColor(sf::Color::Green);
 	window.draw(lifeFill);
 
+	if (hit_wait > 0.0f)
+	{
+		sf::RectangleShape hitEffect;
+		hitEffect.setFillColor(sf::Color::Color(255,0,0, 150 - (hit_wait * 150)/30));
+		hitEffect.setSize(sf::Vector2f(window.getSize()));
+		window.draw(hitEffect);
+	}
 }
 
-bool Player::update(float deltatime,Player* player)
+
+bool Player::update(float& deltatime,Player* player)
 {
 	this->last_delta = deltatime;
 	bool has_move = false;
@@ -207,12 +214,32 @@ bool Player::auto_collision(sf::Vector2f item_position, sf::Vector2f item_size)
 bool Player::check_attack(Player& player)
 {
 	float dist = sqrt(pow(player.position.x - position.x, 2) + pow(player.position.y - this->position.y, 2));
-	if ((dist < this->size.x + (this->size.y / 4)) && player.direction != this->direction)
+	if ((dist < this->size.x + (this->size.y / 4)))// && player.direction != this->direction)
 	{
 		if ((this->position.y > player.position.y - player.size.y / 2) && (this->position.y < player.position.y + player.size.y / 2))
 		{
 			return true;
 		}
+	}
+	return false;
+}
+
+void Player::hit_animation()
+{
+	hit_wait = 1.0f;
+}
+
+bool Player::hit_update(float& deltatime)
+{
+
+	if (hit_wait != 0.0f)
+	{
+		hit_wait += 20 * deltatime;
+		if (hit_wait > 30.0f)
+		{
+			hit_wait = 0.0f;
+		}
+		return true;
 	}
 	return false;
 }

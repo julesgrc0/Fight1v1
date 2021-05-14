@@ -139,17 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameAssets.cpp" />
+    <ClCompile Include="Background.cpp" />
     <ClCompile Include="GameClient.cpp" />
-    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameAssets.h" />
+    <ClInclude Include="Background.h" />
     <ClInclude Include="GameClient.h" />
-    <ClInclude Include="HUD.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
