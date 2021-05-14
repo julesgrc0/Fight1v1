@@ -40,6 +40,7 @@ bool GameClient::listen(Player* player,Player* second)
 		player->position.x = x;
 		player->position.y = y;
 		player->direction = (PlayerDirection)direction;
+		player->direction = player->direction == RIGHT ? LEFT : RIGHT;
 		player->state = (PlayerStates)state;
 		second->life = p2_life;
 

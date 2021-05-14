@@ -1,9 +1,47 @@
 #include "Player.h"
 
+static std::vector<std::string> split(const std::string& txt, char ch)
+{
+	size_t pos = txt.find(ch);
+	size_t initialPos = 0;
+	std::vector<std::string> strs;
+
+	while (pos != std::string::npos)
+	{
+		strs.push_back(txt.substr(initialPos, pos - initialPos));
+		initialPos = pos + 1;
+		pos = txt.find(ch, initialPos);
+	}
+	strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
+
+	return strs;
+}
+
+std::string get_current_path()
+{
+	TCHAR buffer[MAX_PATH] = { 0 };
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::wstring wpath(buffer);
+	std::string path(wpath.begin(), wpath.end());
+
+	std::vector<std::string> split_path = split(path, '\\');
+	split_path.erase(split_path.end() - 1);
+
+	path = "";
+	for (size_t i = 0; i < split_path.size(); i++)
+	{
+		path += split_path[i] + "/";
+	}
+
+	return path;
+}
+
 Player::Player()
 {
-	this->player_l.loadFromFile("C:/Users/jules/source/repos/1vs1-2D/1vs1-2D/x64/Debug/attack_l.png", sf::IntRect(0, 0, 100, 100));
-	this->player_r.loadFromFile("C:/Users/jules/source/repos/1vs1-2D/1vs1-2D/x64/Debug/attack_r.png", sf::IntRect(0, 0, 100, 100));
+	std::string path = get_current_path();
+
+	this->player_l.loadFromFile(path +"\\attack_l.png", sf::IntRect(0, 0, 100, 100));
+	this->player_r.loadFromFile(path+"\\attack_r.png", sf::IntRect(0, 0, 100, 100));
 }
 
 void Player::draw(sf::RenderWindow& window)
@@ -49,12 +87,12 @@ void Player::draw(sf::RenderWindow& window)
 }
 
 
-bool Player::update(float& deltatime,Player* player)
+bool Player::update(float& deltatime, Player* player)
 {
 	this->last_delta = deltatime;
 	bool has_move = false;
-	bool up_active = false;
-	bool down_active = false;
+	bool lr = false;
+	bool ud = false;
 	bool attack = false;
 	sf::Vector2f before_position = this->position;
 
@@ -67,62 +105,59 @@ bool Player::update(float& deltatime,Player* player)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		up_active = true;
 		has_move = true;
+		ud = true;
 		this->position.y -= move;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		down_active = true;
 		has_move = true;
+		ud = true;
 		this->position.y += move;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		if (up_active || down_active)
-		{
-			this->position.x -= move / 2;
-			
-			if (up_active)
-			{
-				this->position.y += move /2;
-			}
-			else if (down_active)
-			{
-				this->position.y -= move /2;
-			}
-		}else
-		{
-			has_move = true;
-			this->position.x -= move;
-		}
-
+		has_move = true;
+		lr = true;
+		this->position.x -= move;
 		this->direction = LEFT;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		if (up_active || down_active)
-		{
-			this->position.x += move / 2;
+		has_move = true;
+		lr = true;
+		this->position.x += move;
+		this->direction = RIGHT;
+	}
 
-			if (up_active)
-			{
-				this->position.y += move / 2;
-			}
-			else if (down_active)
-			{
-				this->position.y -= move / 2;
-			}
+	if (lr && ud)
+	{
+		if (position.x > last_position.x)
+		{
+			this->position.x -= move;
+			this->position.x += move / 2;
 		}
 		else
 		{
-			has_move = true;
 			this->position.x += move;
+			this->position.x -= move / 2;
 		}
-		this->direction = RIGHT;
+
+		if (position.y > last_position.y)
+		{
+			this->position.y -= move;
+			this->position.y += move / 2;
+		}
+		else
+		{
+			this->position.y += move;
+			this->position.y -= move / 2;
+		}
 	}
+
 	
+
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 	{
 		attack_wait += 90 * deltatime;
@@ -135,12 +170,17 @@ bool Player::update(float& deltatime,Player* player)
 			if (this->check_attack((*player)))
 			{
 				player->life -= 10;
+
+				if (player->life <= 0)
+				{
+					player->life = 0;
+				}
 				attack = true;
 			}
 		}
 	}
 
-	
+
 
 	if (has_move)
 	{

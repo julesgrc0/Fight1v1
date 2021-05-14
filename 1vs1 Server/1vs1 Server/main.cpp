@@ -5,7 +5,6 @@
 #include <chrono>
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
@@ -30,8 +29,7 @@ std::string get_local_ipv4()
     pIPAddrTable = (MIB_IPADDRTABLE*)MALLOC(sizeof(MIB_IPADDRTABLE));
 
     if (pIPAddrTable) {
-        if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) ==
-            ERROR_INSUFFICIENT_BUFFER) {
+        if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER) {
             FREE(pIPAddrTable);
             pIPAddrTable = (MIB_IPADDRTABLE*)MALLOC(dwSize);
         }
@@ -39,7 +37,8 @@ std::string get_local_ipv4()
             exit(1);
         }
     }
-    if ((dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)) != NO_ERROR) {
+    if ((dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)) != NO_ERROR) 
+	{
         exit(1);
     }
 

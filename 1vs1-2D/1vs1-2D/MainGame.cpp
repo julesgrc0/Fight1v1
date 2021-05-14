@@ -74,7 +74,9 @@ void render(sf::RenderWindow* window, MainGame* game)
 int MainGame::run()
 {
 	this->main_player.position = sf::Vector2f(10, 225);
+	this->main_player.last_position = main_player.position;
 	this->second_player.position = sf::Vector2f(440, 225);
+	second_player.last_position = second_player.position;
 	this->second_player.direction = LEFT;
 
 	sf::RenderWindow window(sf::VideoMode(500,500), "1vs1", sf::Style::Close);
@@ -142,14 +144,18 @@ int MainGame::run()
 			this->render_update = true;
 		}
 		
-		if (windowFocus && this->main_player.update(deltatime,&second_player))
+		if (windowFocus)
 		{
-			this->main_player.auto_collision(this->second_player.position, this->second_player.size);
+			if (this->main_player.update(deltatime, &second_player))
+			{
+				this->main_player.auto_collision(this->second_player.position, this->second_player.size);
+				this->render_update = true;
+			}
+
 			if (serverReady)
 			{
-				this->client.send(this->main_player,this->second_player);
+				this->client.send(this->main_player, this->second_player);
 			}
-			this->render_update = true;
 		}
 	}
 	return 0;
