@@ -3,14 +3,15 @@
 #include <SFML/Network.hpp>
 #include "Player.h"
 
+
 class GameClient
 {
 public:
 	GameClient();
 	~GameClient();
 	bool connect(const char*);
-	void send(Player&);
-	bool listen(Player*);
+	void send(Player&,Player&);
+	bool listen(Player*, Player*);
 private:
 	sf::TcpSocket socket;
 };

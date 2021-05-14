@@ -1,5 +1,4 @@
 #include "GameClient.h"
-#include<iostream>
 
 GameClient::GameClient()
 {
@@ -15,15 +14,15 @@ bool GameClient::connect(const char* local)
 	return true;
 }
 
-void GameClient::send(Player& player)
+void GameClient::send(Player& player,Player& second)
 {
 	sf::Packet packet;
-	packet << (int)player.state << (float)player.position.x << (float)player.position.y << (int)player.life << (int)player.direction;
+	packet << (int)player.state << (float)(440 - player.position.x) << (float)player.position.y << (int)player.life << (int)player.direction << (float)second.life;
 	this->socket.send(packet);
 }
 
 
-bool GameClient::listen(Player* player)
+bool GameClient::listen(Player* player,Player* second)
 {
 	sf::Packet packet;
 	if (this->socket.receive(packet) == sf::Socket::Done)
@@ -33,14 +32,16 @@ bool GameClient::listen(Player* player)
 		float y;
 		int life;
 		int direction;
+		float p2_life;
 
-		packet >> state >> x >> y >> life >> direction;
+		packet >> state >> x >> y >> life >> direction >> p2_life;
 
 		player->life = life;
 		player->position.x = x;
 		player->position.y = y;
 		player->direction = (PlayerDirection)direction;
 		player->state = (PlayerStates)state;
+		second->life = p2_life;
 
 		return true;
 	}
