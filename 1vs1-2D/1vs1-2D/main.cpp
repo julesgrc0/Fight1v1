@@ -5,14 +5,6 @@
 #include <string>
 #include <Windows.h>
 
-extern "C"
-{
-#include "lua5.4-include/lauxlib.h"
-#include "lua5.4-include/lua.h"
-#include "lua5.4-include/lualib.h"
-}
-
-
 #ifdef _WIN64
 #pragma comment(lib,"lua-5.4-x64/liblua54.a")
 #else
@@ -23,32 +15,14 @@ extern "C"
 
 int main(int argc, const char* argv[])
 {
-	lua_State* L = luaL_newstate();
-	if(argc > 1)
+	std::string lua_bot = "C:/Users/jules/source/repos/1vs1-2D/1vs1-2D/1vs1-2D/test_bot.lua";
+	if (argc > 1)
 	{
-			std::ifstream ifs(argv[1]);
-			if (ifs)
-			{
-				std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-				luaL_openlibs(L);
-
-				int lua_result = luaL_dostring(L, content.c_str());
-				
-				if (lua_result == LUA_OK)
-				{
-					
-				}else
-				{
-					std::cout << "Fail " << lua_tostring(L,-1) << std::endl;
-				}
-			}
-			else
-			{
-				std::cout << "Fail to read input file !" << std::endl;
-			}
+		lua_bot = std::string(argv[1]);
 	}
 
 	ShowWindow(GetForegroundWindow(), SW_SHOW);
+
 	std::cout << "Enter server ip:";
 	std::string ip;
 	std::getline(std::cin, ip);
@@ -57,10 +31,6 @@ int main(int argc, const char* argv[])
 		ShowWindow(GetForegroundWindow(), SW_HIDE);
 	#endif // !_DEBUG
 
-	MainGame* game = new MainGame(ip);
-	int exit_code = game->run();
-	
-	lua_close(L);
-
-	return exit_code;
+	MainGame* game = new MainGame(ip,lua_bot);
+	return game->run();
 }

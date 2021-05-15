@@ -28,6 +28,7 @@ public:
 	PlayerStates state = STATIC;
 	PlayerDirection direction = RIGHT;
 	float life = 100.0f;
+	const float move_speed = 400.0f;
 
 	void draw(sf::RenderWindow&);
 	bool update(float&,Player*);
@@ -43,7 +44,7 @@ private:
 	float attack_wait = 0.0f;
 	float last_delta;
 	float hit_wait = 0.0f;
-	const float move_speed = 400.0f;
+	
 	sf::Texture player_r;
 	sf::Texture player_l;
 };
